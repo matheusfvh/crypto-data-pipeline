@@ -208,6 +208,7 @@ __marimo__/
 
 # --- Segurança e Credenciais Personalizadas ---
 *.json
+google_credentials.json
 credentials/
 auth/
 tokens.txt
