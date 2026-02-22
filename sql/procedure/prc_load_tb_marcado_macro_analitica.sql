@@ -11,6 +11,7 @@ Estratégia:
   5. Transação: TRUNCATE + INSERT com colunas explícitas.
 ----------------------------------------------------------------------
 */
+
 CREATE OR REPLACE PROCEDURE `crypto-pipeline-teste.crypto_data.prc_load_tb_mercado_macro_analitica`(
     p_project_id STRING,
     p_dataset_id STRING
@@ -105,7 +106,7 @@ BEGIN
             vlr_variacao_24h_pct, 
             vlr_vwap_24h,
             desc_sentimento_tendencia, 
-            dt_hr_processado
+            TIMESTAMP(DATETIME(dt_hr_processado, "America/Sao_Paulo"))
         FROM tmp_macro_assets
     """;
 

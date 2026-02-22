@@ -65,7 +65,11 @@ BEGIN
         INNER JOIN tmp_assets a
             ON LOWER(TRIM(m.baseId)) = a.id_join
             AND TIMESTAMP_TRUNC(CAST(m.processado_em AS TIMESTAMP), SECOND) = a.dt_hr_processado
-        LEFT JOIN `""" || p_project_id || """.""" || p_dataset_id || """.tb_exchanges` e
+        LEFT JOIN (
+            SELECT exchangeId, name 
+            FROM `""" || p_project_id || """.""" || p_dataset_id || """.tb_exchanges`
+            QUALIFY ROW_NUMBER() OVER(PARTITION BY LOWER(TRIM(exchangeId)) ORDER BY processado_em DESC) = 1
+        ) e
             ON LOWER(TRIM(m.exchangeId)) = LOWER(TRIM(e.exchangeId))
         WHERE LOWER(TRIM(m.quoteId)) IN (
             'united-states-dollar', 'tether', 'usd-coin', 'binance-usd', 
@@ -155,7 +159,7 @@ BEGIN
             vlr_preco_venda,
             vlr_margem_lucro_percentual,
             vlr_volume_gargalo_usd,
-            dt_hr_processado
+            TIMESTAMP(DATETIME(dt_hr_processado, "America/Sao_Paulo"))
         FROM tmp_final
     """;
 
