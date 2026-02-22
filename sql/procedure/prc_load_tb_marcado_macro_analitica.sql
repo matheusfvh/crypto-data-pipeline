@@ -4,7 +4,7 @@ DOCUMENTAÇÃO
 Procedure: prc_load_tb_mercado_macro_analitica
 Objetivo: Carga Full (Snapshot) da Tabela Refined (Visão Macro de Mercado).
 Estratégia: 
-  1. Parametrização via Dynamic SQL com concatenação nativa (||).
+  1. Parametrização para evitar repetições de código.
   2. DQ Check 1: Freshness (Valida defasagem da origem).
   3. Tratamento de tipagem e regras de negócio (Sentimento).
   4. DQ Check 2: Volume Anomaly (Garante que há moedas processadas).
