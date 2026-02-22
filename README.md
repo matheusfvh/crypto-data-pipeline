@@ -82,7 +82,7 @@ O pipeline está configurado em produção rodando autonomamente duas vezes ao d
 ## 📂 Estrutura do Repositório
 
 ```text
-crypto-pipeline-teste/
+crypto-data-pipeline/
 ├── docs/               # Documentação, evidências visuais e arquitetura
 │   └── img/            # Prints de execução censurados (Scheduler, BigQuery, Looker)
 ├── sql/
