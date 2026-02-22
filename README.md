@@ -12,53 +12,8 @@ O objetivo é extrair dados em tempo real da API pública da CoinCap, processar 
 
 A solução adota a arquitetura **ELT (Extract, Load, Transform)**. O processamento pesado foi delegado ao Data Warehouse, garantindo resiliência na extração e alta performance analítica.
 
-```mermaid
-%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#F0F7FF', 'edgeLabelBackground':'#ffffff', 'tertiaryColor': '#fff0f0'}}}%%
-graph LR
-    subgraph External [Fonte Externa]
-        API["📱 CoinCap API<br/>(REST/Public)"]
-    end
-
-    subgraph GCP [Google Cloud Platform - Serverless ELT]
-        Scheduler(("⏱️ Cloud Scheduler<br/>Trigger 2x/dia"))
-        Function["⚡ Cloud Functions<br/>Python 3.12<br/>(Worker Privado)"]
-        
-        subgraph BQ [BigQuery - Data Warehouse]
-            Raw[("🗄️ Raw Layer<br/>Dados Brutos STRING<br/>Append-Only")]
-            Procedures[["⚙️ Stored Procedures<br/>SQL Transformations<br/>Data Quality Checks"]]
-            Refined[("💎 Refined Layer<br/>Tipados & Clusterizados<br/>Fuso BRT")]
-        end
-    end
-
-    subgraph BI [Visualização]
-        Looker["📊 Looker Studio<br/>Dashboard Analítico"]
-    end
-
-    %% Fluxo de Orquestração
-    Scheduler -.->|"Token OIDC seguro<br/>(Autenticação IAM)"| Function
-
-    %% Fluxo de Dados
-    API -->|"HTTPS JSON<br/>(Extração)"| Function
-    Function -->|"Carga (Load)<br/>Schema Enforcement Dinâmico"| Raw
-    
-    %% Fluxo de Transformação
-    Raw -->|"Leitura"| Procedures
-    Procedures -->|"Gravação (Insert/Update)"| Refined
-
-    %% Fluxo de Consumo
-    Refined -->|"Conexão Nativa<br/>(Alta Performance)"| Looker
-
-    %% Estilização
-    classDef source fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
-    classDef compute fill:#fff3e0,stroke:#ff9800,stroke-width:2px;
-    classDef storage fill:#e8f5e9,stroke:#43a047,stroke-width:2px;
-    classDef bi fill:#f3e5f5,stroke:#8e24aa,stroke-width:2px;
-    
-    class API source;
-    class Scheduler,Function,Procedures compute;
-    class Raw,Refined storage;
-    class Looker bi;
-```
+  <img src="docs/img/00_arquitetura.png" alt="Arquitetura do projeto">
+  *Imagem gerada com IA
 
 ### 🛠️ Stack Tecnológica
 * **Linguagem:** Python 3.12 (`pandas`, `requests`, `google-cloud-bigquery`)
@@ -112,6 +67,8 @@ O pipeline está configurado em produção rodando autonomamente duas vezes ao d
   <summary><b>2. Camada Refined (BigQuery)</b></summary>
   <br>
   <img src="docs/img/03_refined_tb_mercado_macro_analitica.png" alt="BigQuery Schema">
+  <br>
+  <img src="docs/img/04_refined_tb_arbitragem_analitica.png" alt="BigQuery Schema">
 </details>
 
 <details>
