@@ -4,3 +4,4 @@ pandas
 pandas-gbq
 google-cloud-bigquery
 db-dtypes
+python-dotenv==1.0.1

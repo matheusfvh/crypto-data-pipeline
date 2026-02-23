@@ -53,9 +53,13 @@ O pipeline não apenas extrai dados, mas aplica padrões corporativos de resili�
 
 ---
 
-## 📸 Evidências de Execução
+## 📊 Dashboard Interativo e Evidências
 
 O pipeline está configurado em produção rodando autonomamente duas vezes ao dia (09:00 e 19:00 BRT).
+
+👉 **[Acessar o Dashboard Interativo (Looker Studio)](https://lookerstudio.google.com/reporting/8e57ea39-ac2d-4562-923c-c882ec0821b8)**
+
+Abaixo estão as evidências da infraestrutura em operação na nuvem:
 
 <details>
   <summary><b>1. Execução Autenticada (Cloud Scheduler)</b></summary>
@@ -79,19 +83,72 @@ O pipeline está configurado em produção rodando autonomamente duas vezes ao d
 
 ---
 
+## 💻 Como Executar Localmente (Setup de Desenvolvimento)
+
+*Nota de Arquitetura: O pipeline foi projetado com separação de responsabilidades. O arquivo `main.py` contém exclusivamente a lógica de produção (Cloud Functions). Para testes locais, criamos o wrapper `run_local.py`, que simula o ambiente da nuvem injetando as variáveis de ambiente sem alterar o código principal.*
+
+Caso deseje replicar este pipeline em seu próprio ambiente, siga os passos abaixo:
+
+**1. Pré-requisitos e Infraestrutura:**
+* Python 3.12+ instalado.
+* Um projeto ativo no Google Cloud com a API do BigQuery habilitada.
+* **Banco de Dados:** Antes de rodar o código, é necessário espelhar a estrutura no seu BigQuery. Execute os scripts SQL disponíveis nas pastas `sql/ddl/` e `sql/procedures/` para criar as tabelas e lógicas de transformação.
+* **Service Account (SA):** Crie uma Conta de Serviço no IAM do GCP com o papel de `Editor de Dados do BigQuery`. Gere uma chave no formato **JSON** e baixe para a sua máquina (Mantenha este arquivo seguro).
+
+**2. Configuração do Ambiente:**
+
+```bash
+# 1. Clone o repositório
+git clone https://github.com/matheusfvh/crypto-data-pipeline.git
+cd crypto-data-pipeline
+
+# 2. Crie e ative o ambiente virtual
+python -m venv venv
+source venv/bin/activate  # No Windows utilize: venv\Scripts\activate
+
+# 3. Instale as dependências
+pip install -r src/requirements.txt
+```
+
+**3. Variáveis de Ambiente (.env):**
+Crie um arquivo chamado `.env` na raiz do projeto. Ele será lido automaticamente pelo script de teste local.
+
+*(Nota: O arquivo `.env` já está mapeado no `.gitignore` do repositório para garantir a segurança das credenciais).*
+
+```env
+GCP_PROJECT_ID=seu-id-do-projeto
+GCP_DATASET_ID=seu_nome_do_dataset
+COINCAP_API_KEY=sua_api_key_coincap_aqui
+GOOGLE_APPLICATION_CREDENTIALS="/caminho/absoluto/para/sua/chave-sa.json"
+```
+
+*Dica para usuários de Windows: no caminho da credencial, utilize barras normais (/) ou barras invertidas duplas (\\) para evitar erros de leitura do caminho.
+
+**4. Execução do Pipeline:**
+Com a infraestrutura criada e o ambiente configurado, execute o script de teste local:
+
+```bash
+python src/run_local.py
+```
+O terminal exibirá os logs do processo (Extract, Load, Transform), executando a extração da API e gravando os dados diretamente no seu BigQuery.
+
+---
+
 ## 📂 Estrutura do Repositório
 
 ```text
 crypto-data-pipeline/
 ├── docs/               # Documentação, evidências visuais e arquitetura
-│   └── img/            # Prints de execução censurados (Scheduler, BigQuery, Looker)
+│   └── img/            # Prints de execução (Scheduler, BigQuery, Looker)
 ├── sql/
-│   ├── ddl/            # Scripts de criação das tabelas (Raw e Refined)
-│   └── procedures/     # Lógicas de negócio e qualidade de dados em PL/SQL
+│   ├── ddl/            # Scripts de criação das tabelas (Camadas Raw e Refined)
+│   └── procedures/     # Lógicas de negócio e qualidade de dados (PL/SQL)
 ├── src/
-│   ├── main.py         # Código fonte da Cloud Function (Motor ELT)
-│   └── requirements.txt
-└── README.md           # Documentação principal
+│   ├── main.py         # Código-fonte principal (Entrypoint da Cloud Function)
+│   ├── run_local.py    # Wrapper para execução e testes em ambiente local
+│   └── requirements.txt# Dependências do projeto (Pandas, BigQuery, Dotenv)
+├── .env.example        # Modelo de variáveis de ambiente (sem dados sensíveis)
+└── README.md           # Documentação técnica completa do projeto
 ```
 
 ---

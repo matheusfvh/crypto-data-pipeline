@@ -3,7 +3,7 @@ import requests
 import pandas as pd
 import os
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from google.cloud import bigquery
 
 # Configuração de Logs para ambiente Cloud
@@ -93,7 +93,7 @@ def handler(request):
     # Headers de autenticação (Opcional, mas recomendado para evitar Rate Limiting)
     headers = {'Authorization': f"Bearer {API_KEY}"} if API_KEY else {}
     base_url = "https://rest.coincap.io/v3"
-    timestamp_processamento = datetime.now()
+    timestamp_processamento = datetime.now(timezone.utc)
     
     bq_client = bigquery.Client(project=PROJECT_ID)
 
